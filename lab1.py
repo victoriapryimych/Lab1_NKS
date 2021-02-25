@@ -20,9 +20,33 @@ for t in t_input:
     t_vidm.append(t[0])
 
 t_vidm = list(map(int, t_vidm))
-gamma = float(input("Введіть значення гамма: "))
-time1 = int(input("Введіть час, для якого треба визначити ймовірність безвідмовної роботи: "))
-time2 = int(input("Введіть час, для якого треба визначити інтенсивність відмов: "))
+while True:
+    try:
+        gamma = float(input("Введіть значення гамма: "))
+        if 0 < gamma < 1:
+            break
+        else:
+            print("Гамма має бути в межах від 0 до 1")
+    except ValueError:
+        print("Некоректне значення гамма")
+while True:
+    try:
+        time1 = int(input("Введіть час, для якого треба визначити ймовірність безвідмовної роботи: "))
+        if 0 < time1 < max(t_vidm):
+            break
+        else:
+            print("Некоректне значення")
+    except ValueError:
+        print("Некоректне значення")
+while True:
+    try:
+        time2 = int(input("Введіть час, для якого треба визначити інтенсивність відмов: "))
+        if 0 < time2 < max(t_vidm):
+            break
+        else:
+            print("Некоректне значення")
+    except ValueError:
+        print("Некоректне значення")
 print("-------------------------------------------------------------------")
 T_ser = sum(t_vidm) / len(t_vidm)
 print("Середній наробіток до відмови:", T_ser)
@@ -33,7 +57,7 @@ for i in range(11):
     intervals.append(round(i * h, 6))
 print("Інтервали:")
 for i in range(10):
-    print("Інтервал {}: {} - {}".format(i+1, intervals[i], intervals[i + 1]))
+    print("Інтервал {}: {} - {}".format(i + 1, intervals[i], intervals[i + 1]))
 
 Ni = []
 count = 0
@@ -49,7 +73,7 @@ for n in Ni:
     fi.append(round(n / (len(t_vidm) * h), 6))
 print("Значення статистичної щільності розподілу ймовірності відмови:")
 for i in range(len(fi)):
-    print("f{} = {:.6f}".format(i+1, fi[i]))
+    print("f{} = {:.6f}".format(i + 1, fi[i]))
 
 P = []
 P0 = 1
@@ -60,14 +84,15 @@ for f in fi:
     P.append(round(S, 2))
 print("Ймовірність безвідмовної роботи пристрою на час правої границі інтервалу:")
 print("P(0) = {}".format(P[0]))
-for i in range(len(P)-1):
-    print("P({}) = {:.3f}".format(intervals[i+1], P[i+1]))
+for i in range(len(P) - 1):
+    print("P({}) = {:.3f}".format(intervals[i + 1], P[i + 1]))
 
 T_gamma = 0
-for i in range(len(P) - 1):
-    if P[i] > gamma > P[i + 1]:
-        d = round((P[i] - gamma) / (P[i] - P[i + 1]), 2)
-        T_gamma = i + h * d
+for i in range(1, len(P)):
+    if P[i - 1] > gamma > P[i]:
+        d = round((P[i] - gamma) / (P[i] - P[i - 1]), 2)
+        print("d =", d)
+        T_gamma = round(intervals[i] - h * d, 6)
 print("Статистичний γ-відсотковий наробіток на відмову:\nT_gamma:", T_gamma)
 
 print("Ймовірність безвідмовної роботи на час {} годин:\nP({}) = {}".format(time1, time1, p_time(time1, 0)))
